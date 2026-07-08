@@ -12,12 +12,30 @@ export class PlannerRenderer {
     this.agendaTaskCount = get("#agendaTaskCount");
     this.agendaTitle = get("#agendaTitle");
     this.agendaCopy = get("#agendaCopy");
+    this.mobileAgendaElement = get("#mobileAgendaModal");
+    this.mobileAgendaTitle = get("#mobileAgendaTitle");
+    this.mobileAgendaCount = get("#mobileAgendaCount");
+    this.mobileAgendaList = get("#mobileAgendaList");
+    this.mobileAgendaAddTask = get("#mobileAgendaAddTask");
+    this.mobileAgendaModal = this.mobileAgendaElement ? new bootstrap.Modal(this.mobileAgendaElement) : null;
+    this.mobileAgendaDate = "";
+    this.mobileAgendaTasks = [];
+    this.mobileAgendaFormattedDay = "";
     this.expandedAgendaTaskId = null;
     this.onAddTask = onAddTask;
     this.onEditTask = onEditTask;
     this.onDeleteTask = onDeleteTask;
     this.onDropTask = onDropTask;
     this.onSelectDate = onSelectDate;
+
+    this.mobileAgendaAddTask?.addEventListener("click", () => {
+      if (!this.mobileAgendaDate) {
+        return;
+      }
+
+      this.mobileAgendaModal?.hide();
+      this.onAddTask(this.mobileAgendaDate);
+    });
   }
 
   renderWeekdays() {
@@ -27,6 +45,7 @@ export class PlannerRenderer {
         create("div", {
           className: "weekday-pill",
           text: weekday.charAt(0).toUpperCase() + weekday.slice(1),
+          dataset: { short: weekday.slice(0, 3).charAt(0).toUpperCase() + weekday.slice(1, 3) },
         })
       );
     });
@@ -63,7 +82,7 @@ export class PlannerRenderer {
         );
       }
       this.attachDropZone(dayCard);
-      this.attachDaySelection(dayCard);
+      this.attachDaySelection(dayCard, day, tasks);
       this.calendarGrid.append(dayCard);
     });
 
@@ -82,13 +101,21 @@ export class PlannerRenderer {
       meta.append(create("span", { className: "day-count-badge", text: String(taskCount) }));
     }
 
+    const mobileTaskCount = create("span", {
+      className: "mobile-day-task-count",
+      text: String(taskCount),
+      attributes: {
+        "aria-label": `${taskCount} ${taskCount === 1 ? "tarea" : "tareas"}`,
+      },
+    });
+
     const addButton = create("button", {
       className: "task-add-button",
       text: "+",
       attributes: { type: "button", "aria-label": `Crear tarea para el ${day.iso}` },
     });
 
-    wrapper.append(dayNumber, meta, addButton);
+    wrapper.append(dayNumber, meta, mobileTaskCount, addButton);
     addButton.addEventListener("click", () => this.onAddTask(day.iso));
     return wrapper;
   }
@@ -146,21 +173,61 @@ export class PlannerRenderer {
     });
   }
 
-  attachDaySelection(dayCard) {
+  attachDaySelection(dayCard, day, tasks) {
     dayCard.addEventListener("click", (event) => {
       if (event.target.closest(".task-action, .task-add-button")) {
         return;
       }
 
       this.onSelectDate(dayCard.dataset.date);
+      if (this.shouldUseAgendaModal()) {
+        this.openMobileAgenda(day.iso, day.date, tasks);
+      }
     });
 
     dayCard.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         this.onSelectDate(dayCard.dataset.date);
+        if (this.shouldUseAgendaModal()) {
+          this.openMobileAgenda(day.iso, day.date, tasks);
+        }
       }
     });
+  }
+
+  shouldUseAgendaModal() {
+    return window.matchMedia("(max-width: 1199px)").matches;
+  }
+
+  openMobileAgenda(dateISO, date, tasks) {
+    if (!this.mobileAgendaModal) {
+      return;
+    }
+
+    this.mobileAgendaDate = dateISO;
+    this.mobileAgendaTasks = tasks;
+    const formattedDay = formatDate(date, { weekday: "long", day: "numeric", month: "long" });
+    this.mobileAgendaFormattedDay = formattedDay;
+    this.mobileAgendaTitle.textContent = formattedDay;
+    this.mobileAgendaCount.textContent = `${tasks.length} ${tasks.length === 1 ? "tarea" : "tareas"}`;
+    this.renderMobileAgendaTasks();
+    this.mobileAgendaModal.show();
+  }
+
+  renderMobileAgendaTasks() {
+    this.mobileAgendaList.innerHTML = "";
+
+    if (!this.mobileAgendaTasks.length) {
+      this.mobileAgendaList.append(
+        create("div", {
+          className: "agenda-empty-state",
+          text: "No hay tareas programadas para este día.",
+        })
+      );
+    } else {
+      this.mobileAgendaTasks.forEach((task) => this.mobileAgendaList.append(this.createAgendaCard(task)));
+    }
   }
 
   renderAgenda(selectedDate, selectedTasks) {
@@ -224,6 +291,7 @@ export class PlannerRenderer {
 
     editButton.addEventListener("click", (event) => {
       event.stopPropagation();
+      this.mobileAgendaModal?.hide();
       this.onEditTask(task.id);
     });
 
@@ -247,6 +315,11 @@ export class PlannerRenderer {
       }
 
       this.expandedAgendaTaskId = this.expandedAgendaTaskId === task.id ? null : task.id;
+      if (this.mobileAgendaModal && this.mobileAgendaElement.classList.contains("show")) {
+        this.renderMobileAgendaTasks();
+        return;
+      }
+
       this.onSelectDate(task.date);
     });
 

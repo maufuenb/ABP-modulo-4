@@ -72,6 +72,7 @@ body {
 
 .planner-app {
   width: 100%;
+  min-height: 100vh;
   position: relative;
   z-index: 1;
 }
@@ -79,6 +80,11 @@ body {
 .calendar-workspace {
   width: 100%;
   padding: 0 1.25rem;
+}
+
+.planner-app > .calendar-workspace {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
 }
 
 .calendar-panel,
@@ -345,6 +351,8 @@ body {
 .agenda-sidebar {
   position: sticky;
   top: 1.25rem;
+  max-height: calc(100vh - 2.5rem);
+  overflow: hidden;
   padding: 1.15rem;
   border-radius: 24px;
   border: 1px solid rgba(148, 163, 184, 0.12);
@@ -390,7 +398,18 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-height: calc(100vh - 13rem);
+  overflow-y: auto;
   padding-right: 0.2rem;
+}
+
+.agenda-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.agenda-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
 }
 
 .agenda-day-group {
@@ -705,6 +724,10 @@ body {
   font-weight: 700;
 }
 
+.mobile-day-task-count {
+  display: none;
+}
+
 .day-holiday-reason {
   margin: auto 0 0;
   overflow: hidden;
@@ -814,6 +837,28 @@ body {
   max-width: min(1120px, calc(100vw - 2rem));
 }
 
+.agenda-modal-dialog {
+  max-width: min(560px, calc(100vw - 2rem));
+}
+
+.agenda-modal {
+  border-radius: 22px;
+}
+
+.agenda-modal-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.agenda-modal-list {
+  max-height: min(62vh, 560px);
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
 .task-form {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -840,7 +885,16 @@ body {
   resize: none;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1199px) {
+  .calendar-workspace {
+    padding: 0 1rem;
+  }
+
+  .calendar-panel {
+    padding: 1rem;
+    border-radius: 24px;
+  }
+
   .calendar-panel-header {
     grid-template-columns: 1fr;
     align-items: flex-start;
@@ -856,8 +910,89 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .calendar-weekdays,
+  .calendar-grid {
+    gap: 0.45rem;
+  }
+
+  .calendar-day .task-list {
+    display: none;
+  }
+
+  .day-meta {
+    display: none;
+  }
+
+  .calendar-day:not(.is-empty) .mobile-day-task-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 180, 76, 0.22);
+    background: rgba(255, 180, 76, 0.14);
+    color: var(--accent-deep);
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  .calendar-day {
+    min-height: 88px;
+    padding: 0.55rem;
+    border-radius: 16px;
+  }
+
+  .calendar-day.is-empty {
+    min-height: 68px;
+  }
+
+  .day-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 0.35rem;
+    height: 100%;
+    margin-bottom: 0;
+  }
+
+  .day-number {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .task-add-button {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .calendar-day:not(.is-empty) .mobile-day-task-count {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-self: center;
+    justify-self: center;
+  }
+
+  .calendar-day.is-empty .day-header {
+    grid-template-rows: auto;
+  }
+
+  .calendar-day.is-empty.is-holiday .day-header {
+    margin-bottom: 0;
+  }
+
+  .day-holiday-reason {
+    display: none;
+  }
+
   .agenda-sidebar {
-    position: static;
+    display: none;
+  }
+
+  .agenda-list {
+    max-height: none;
+    overflow-y: visible;
   }
 
   .agenda-card-aside-column {
@@ -879,9 +1014,38 @@ body {
 }
 
 @media (max-width: 767px) {
+  body {
+    min-width: 320px;
+  }
+
+  .planner-shell {
+    overflow-x: hidden;
+  }
+
   .calendar-workspace {
-    width: calc(100% - 1.25rem);
+    width: 100%;
     padding: 0;
+  }
+
+  .calendar-panel {
+    padding: 0.75rem;
+    border-radius: 18px;
+    overflow: visible;
+  }
+
+  .calendar-panel-header {
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
+    padding: 0.35rem 0.15rem 0.75rem;
+  }
+
+  .calendar-title {
+    font-size: 1.35rem;
+  }
+
+  .eyebrow {
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
   }
 
   .calendar-header-actions,
@@ -889,26 +1053,192 @@ body {
     width: 100%;
   }
 
-  .calendar-header-actions .btn,
-  .month-navigation {
-    flex: 1 1 100%;
-  }
-
   .month-navigation {
     justify-content: space-between;
+    gap: 0.35rem;
+    border-radius: 18px;
   }
 
-  .calendar-panel {
-    overflow-x: auto;
+  .month-nav-button {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1.35rem;
+  }
+
+  .month-navigation .btn {
+    min-width: 0;
+    padding-right: 0.85rem;
+    padding-left: 0.85rem;
   }
 
   .calendar-weekdays,
   .calendar-grid {
-    width: 1050px;
+    width: 100%;
+    gap: 0.28rem;
+  }
+
+  .weekday-pill {
+    padding: 0.42rem 0.1rem;
+    border-radius: 8px;
+    font-size: 0;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  .weekday-pill::after {
+    content: attr(data-short);
+    font-size: 0.62rem;
+  }
+
+  .calendar-day {
+    min-height: 68px;
+    padding: 0.32rem;
+    border-radius: 10px;
+  }
+
+  .calendar-day.is-empty {
+    min-height: 54px;
+    padding: 0.32rem;
+  }
+
+  .day-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 0.18rem;
+    height: 100%;
+    margin-bottom: 0;
+  }
+
+  .day-number {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 7px;
+    font-size: 0.7rem;
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .task-add-button {
+    width: 1.2rem;
+    height: 1.2rem;
+    font-size: 0.82rem;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .calendar-day:not(.is-empty) .mobile-day-task-count {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    align-self: center;
+    justify-self: center;
+    min-width: 1.65rem;
+    height: 1.65rem;
+    font-size: 0.72rem;
+  }
+
+  .calendar-day.is-empty .day-header {
+    grid-template-rows: auto;
+  }
+
+  .calendar-day.is-empty.is-holiday .day-header {
+    margin-bottom: 0;
+  }
+
+  .task-list {
+    gap: 0.32rem;
+  }
+
+  .task-card {
+    padding: 0.38rem 0.42rem;
+    border-radius: 10px;
+  }
+
+  .task-card-title {
+    font-size: 0.68rem;
+  }
+
+  .day-holiday-reason {
+    display: none;
+  }
+
+  .agenda-sidebar {
+    padding: 0.9rem;
+    border-radius: 16px;
+  }
+
+  .agenda-sidebar-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .agenda-count {
+    min-height: 28px;
+  }
+
+  .agenda-card {
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 0.65rem;
+    padding: 0.75rem;
+    border-radius: 14px;
+  }
+
+  .agenda-time,
+  .agenda-card-title,
+  .agenda-card-description {
+    font-size: 0.78rem;
+  }
+
+  .agenda-icon-button {
+    width: 1.8rem;
+    height: 1.8rem;
   }
 
   .task-modal-dialog {
-    max-width: calc(100vw - 1rem);
+    max-width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  .agenda-modal-dialog {
+    max-width: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  .agenda-modal {
+    min-height: 100vh;
+    border-radius: 0;
+  }
+
+  .agenda-modal-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .agenda-modal-summary .btn,
+  .agenda-modal-summary .agenda-count {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .agenda-modal-list {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .planner-modal {
+    min-height: 100vh;
+    border-radius: 0;
+  }
+
+  .modal-header,
+  .modal-body {
+    padding-right: 1rem;
+    padding-left: 1rem;
   }
 
   .task-form {
@@ -930,6 +1260,30 @@ body {
 
   .recurrence-grid-days,
   .recurrence-grid-months {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .recurrence-tile {
+    min-height: 48px;
+    padding: 0.5rem;
+    border-radius: 12px;
+  }
+
+  .recurrence-tile-label {
+    display: none;
+  }
+
+  .task-form-actions {
+    flex-direction: column;
+  }
+
+  .task-form-actions > .d-flex {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+
+  .task-form-actions .btn {
+    width: 100%;
   }
 }

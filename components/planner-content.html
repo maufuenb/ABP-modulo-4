@@ -1,4 +1,4 @@
-<section class="planner-app py-4 py-lg-5">
+<section class="planner-app">
   <section class="calendar-workspace">
     <section class="calendar-panel">
       <div class="calendar-panel-header">
@@ -34,3 +34,24 @@
     </section>
   </section>
 </section>
+
+<div class="modal fade" id="mobileAgendaModal" tabindex="-1" aria-labelledby="mobileAgendaTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered agenda-modal-dialog">
+    <div class="modal-content planner-modal agenda-modal">
+      <div class="modal-header border-0 pb-0">
+        <div>
+          <span class="eyebrow">Agenda del día</span>
+          <h2 class="modal-title fs-5 mt-1" id="mobileAgendaTitle">Tareas</h2>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="agenda-modal-summary">
+          <span id="mobileAgendaCount" class="agenda-count">0 registros</span>
+          <button type="button" id="mobileAgendaAddTask" class="btn btn-accent btn-sm">Agregar tarea</button>
+        </div>
+        <div id="mobileAgendaList" class="agenda-list agenda-modal-list" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
