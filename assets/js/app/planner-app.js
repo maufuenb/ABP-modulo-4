@@ -22,7 +22,6 @@ export class PlannerApp {
     this.renderer = new PlannerRenderer({
       onAddTask: (selectedDate) => this.taskModal.open(null, selectedDate),
       onEditTask: (taskId) => this.handleEditTask(taskId),
-      onDeleteTask: (taskId) => this.handleDeleteTask(taskId),
       onDropTask: (taskId, date) => this.handleDropTask(taskId, date),
       onSelectDate: (date) => this.handleSelectDate(date),
     });

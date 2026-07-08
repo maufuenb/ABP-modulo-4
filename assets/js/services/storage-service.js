@@ -21,12 +21,4 @@ export class StorageService {
   saveTasks(tasks) {
     localStorage.setItem(this.storageKey, JSON.stringify(tasks));
   }
-
-  getItem(key) {
-    return localStorage.getItem(key);
-  }
-
-  setItem(key, value) {
-    localStorage.setItem(key, value);
-  }
 }

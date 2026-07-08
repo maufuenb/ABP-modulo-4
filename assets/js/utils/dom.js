@@ -1,7 +1,5 @@
 export const get = (selector, parent = document) => parent.querySelector(selector);
 
-export const getAll = (selector, parent = document) => [...parent.querySelectorAll(selector)];
-
 export const create = (tag, options = {}) => {
   const element = document.createElement(tag);
   const { className, text, html, dataset, attributes } = options;

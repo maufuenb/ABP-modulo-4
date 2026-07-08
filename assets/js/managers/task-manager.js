@@ -20,10 +20,6 @@ export class TaskManager {
     this.tasks = this.storageService.loadTasks();
   }
 
-  getAll() {
-    return [...this.tasks];
-  }
-
   getById(taskId) {
     const { sourceTaskId, occurrenceDate } = splitOccurrenceId(taskId);
     const task = this.tasks.find((currentTask) => currentTask.id === sourceTaskId) || null;
@@ -44,13 +40,6 @@ export class TaskManager {
 
   getByDate(dateISO) {
     return sortTasksByTime(expandTasksInRange(this.tasks, dateISO, dateISO));
-  }
-
-  getByMonth(monthValue) {
-    const [year, month] = monthValue.split("-").map(Number);
-    const monthStart = `${year}-${String(month).padStart(2, "0")}-01`;
-    const monthEnd = `${year}-${String(month).padStart(2, "0")}-${String(new Date(year, month, 0).getDate()).padStart(2, "0")}`;
-    return sortTasksByTime(expandTasksInRange(this.tasks, monthStart, monthEnd));
   }
 
   getByRange(startISO, endISO) {

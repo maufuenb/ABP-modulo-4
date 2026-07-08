@@ -5,13 +5,6 @@ const pad = (value) => String(value).padStart(2, "0");
 export const toISODate = (date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
-export const toMonthValue = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}`;
-
-export const fromMonthValue = (monthValue) => {
-  const [year, month] = monthValue.split("-").map(Number);
-  return new Date(year, month - 1, 1);
-};
-
 export const addDays = (date, amount) => {
   const next = new Date(date);
   next.setDate(next.getDate() + amount);

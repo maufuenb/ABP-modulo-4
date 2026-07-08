@@ -4,7 +4,7 @@ import { getChileHoliday, isSunday } from "../utils/holiday-utils.js";
 import { getTaskColorStyle } from "../utils/task-helpers.js";
 
 export class PlannerRenderer {
-  constructor({ onAddTask, onEditTask, onDeleteTask, onDropTask, onSelectDate }) {
+  constructor({ onAddTask, onEditTask, onDropTask, onSelectDate }) {
     this.calendarGrid = get("#calendarGrid");
     this.calendarWeekdays = get("#calendarWeekdays");
     this.monthLabel = get("#currentMonthLabel");
@@ -20,11 +20,9 @@ export class PlannerRenderer {
     this.mobileAgendaModal = this.mobileAgendaElement ? new bootstrap.Modal(this.mobileAgendaElement) : null;
     this.mobileAgendaDate = "";
     this.mobileAgendaTasks = [];
-    this.mobileAgendaFormattedDay = "";
     this.expandedAgendaTaskId = null;
     this.onAddTask = onAddTask;
     this.onEditTask = onEditTask;
-    this.onDeleteTask = onDeleteTask;
     this.onDropTask = onDropTask;
     this.onSelectDate = onSelectDate;
 
@@ -71,7 +69,7 @@ export class PlannerRenderer {
         },
       });
 
-      dayCard.append(this.createDayHeader(day, tasks.length, holidayName));
+      dayCard.append(this.createDayHeader(day, tasks.length));
       dayCard.append(this.createTaskList(day.iso, tasks));
       if (holidayName) {
         dayCard.append(
@@ -89,7 +87,7 @@ export class PlannerRenderer {
     this.renderAgenda(selectedDate, selectedTasks);
   }
 
-  createDayHeader(day, taskCount, holidayName = "") {
+  createDayHeader(day, taskCount) {
     const wrapper = create("div", { className: "day-header" });
     const dayNumber = create("span", { className: "day-number", text: String(day.date.getDate()) });
     const meta = create("div", { className: "day-meta" });
@@ -175,7 +173,7 @@ export class PlannerRenderer {
 
   attachDaySelection(dayCard, day, tasks) {
     dayCard.addEventListener("click", (event) => {
-      if (event.target.closest(".task-action, .task-add-button")) {
+      if (event.target.closest(".task-add-button")) {
         return;
       }
 
@@ -208,7 +206,6 @@ export class PlannerRenderer {
     this.mobileAgendaDate = dateISO;
     this.mobileAgendaTasks = tasks;
     const formattedDay = formatDate(date, { weekday: "long", day: "numeric", month: "long" });
-    this.mobileAgendaFormattedDay = formattedDay;
     this.mobileAgendaTitle.textContent = formattedDay;
     this.mobileAgendaCount.textContent = `${tasks.length} ${tasks.length === 1 ? "tarea" : "tareas"}`;
     this.renderMobileAgendaTasks();
