@@ -1,0 +1,251 @@
+﻿.calendar-weekdays {
+  margin-bottom: 1rem;
+}
+
+.weekday-pill {
+  padding: 0.85rem 0.75rem;
+  text-align: center;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-soft);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  min-height: 128px;
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 30%),
+    rgba(14, 23, 42, 0.72);
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-day.is-empty {
+  min-height: 62px;
+  padding: 0.7rem 0.75rem;
+}
+
+.calendar-day.is-empty .day-header {
+  margin-bottom: 0;
+}
+
+.calendar-day.is-empty.is-holiday .day-header {
+  margin-bottom: 0.35rem;
+}
+
+.calendar-day.is-empty .task-list {
+  display: none;
+}
+
+.calendar-day:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 180, 76, 0.28);
+  box-shadow: 0 16px 32px rgba(3, 8, 20, 0.28);
+}
+
+.calendar-day.is-outside {
+  opacity: 0.52;
+}
+
+.calendar-day.is-sunday,
+.calendar-day.is-holiday {
+  border-color: rgba(248, 113, 113, 0.38);
+  background:
+    linear-gradient(180deg, rgba(248, 113, 113, 0.12), transparent 34%),
+    rgba(35, 16, 24, 0.72);
+}
+
+.calendar-day.is-sunday .day-number,
+.calendar-day.is-holiday .day-number {
+  color: #fecaca;
+  background: rgba(248, 113, 113, 0.14);
+  border-color: rgba(248, 113, 113, 0.22);
+}
+
+.calendar-day.is-holiday {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 0 0 1px rgba(248, 113, 113, 0.06);
+}
+
+.calendar-day.is-today {
+  border-color: rgba(255, 180, 76, 0.68);
+  background:
+    linear-gradient(180deg, rgba(255, 180, 76, 0.08), transparent 32%),
+    rgba(14, 23, 42, 0.82);
+}
+
+.calendar-day.is-selected {
+  border-color: rgba(125, 211, 252, 0.72);
+  background:
+    linear-gradient(180deg, rgba(125, 211, 252, 0.12), transparent 34%),
+    rgba(14, 23, 42, 0.84);
+  box-shadow: 0 18px 36px rgba(5, 14, 32, 0.34);
+}
+
+.calendar-day.is-drop-target {
+  border-color: rgba(125, 211, 252, 0.95);
+  background: rgba(125, 211, 252, 0.12);
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.day-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.is-today .day-number {
+  background: rgba(255, 180, 76, 0.16);
+  color: var(--accent-deep);
+  border-color: rgba(255, 180, 76, 0.18);
+}
+
+.is-selected .day-number {
+  background: rgba(125, 211, 252, 0.16);
+  border-color: rgba(125, 211, 252, 0.24);
+  color: #d8f3ff;
+}
+
+.day-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.day-today-tag {
+  color: var(--accent-deep);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.day-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.32rem;
+  border-radius: 999px;
+  background: rgba(255, 180, 76, 0.14);
+  border: 1px solid rgba(255, 180, 76, 0.2);
+  color: var(--accent-deep);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.mobile-day-task-count {
+  display: none;
+}
+
+.day-holiday-reason {
+  margin: auto 0 0;
+  overflow: hidden;
+  color: #fecaca;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-day.is-empty .day-holiday-reason {
+  margin-top: auto;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.task-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.8rem;
+  height: 1.8rem;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.task-add-button:hover {
+  background: rgba(255, 180, 76, 0.16);
+  border-color: rgba(255, 180, 76, 0.24);
+  transform: translateY(-1px);
+}
+
+.task-card {
+  border: 1px solid rgba(var(--task-color-rgb, 255, 180, 76), 0.34);
+  border-radius: 16px;
+  padding: 0.55rem 0.7rem;
+  cursor: grab;
+  background: linear-gradient(180deg, rgba(var(--task-color-rgb, 255, 180, 76), 0.24), rgba(var(--task-color-rgb, 255, 180, 76), 0.14));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 0 0 1px rgba(var(--task-color-rgb, 255, 180, 76), 0.08);
+  overflow: hidden;
+}
+
+.task-card:active {
+  cursor: grabbing;
+}
+
+.task-card:hover,
+.agenda-card:hover {
+  border-color: rgba(var(--task-color-rgb, 255, 180, 76), 0.54);
+}
+
+.task-card-title {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-action {
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 999px;
+  padding: 0.34rem 0.72rem;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-main);
+  font-size: 0.78rem;
+}
+
+.task-action:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+

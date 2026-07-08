@@ -1,0 +1,149 @@
+﻿:root {
+  --bg-main: #09111f;
+  --bg-accent: #12233f;
+  --panel: rgba(11, 19, 35, 0.84);
+  --panel-strong: rgba(8, 15, 29, 0.96);
+  --panel-soft: rgba(18, 30, 54, 0.76);
+  --line: rgba(148, 163, 184, 0.18);
+  --line-strong: rgba(148, 163, 184, 0.28);
+  --text-main: #edf4ff;
+  --text-soft: #98abc4;
+  --text-muted: #6e82a0;
+  --accent: #ffb44c;
+  --accent-deep: #ffd18f;
+  --info: #7dd3fc;
+  --success-soft: rgba(52, 211, 153, 0.15);
+  --warning-soft: rgba(251, 191, 36, 0.14);
+  --danger-soft: rgba(248, 113, 113, 0.16);
+  --shadow: 0 26px 80px rgba(1, 5, 16, 0.45);
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Outfit", sans-serif;
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at top left, rgba(255, 180, 76, 0.1), transparent 25%),
+    radial-gradient(circle at bottom right, rgba(30, 64, 175, 0.16), transparent 30%),
+    linear-gradient(140deg, #040914 0%, #0c1629 45%, #132646 100%);
+}
+
+.planner-shell {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.planner-shell::before,
+.planner-shell::after {
+  content: "";
+  position: fixed;
+  inset: auto;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.planner-shell::before {
+  top: 70px;
+  right: -120px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 180, 76, 0.08), transparent 68%);
+}
+
+.planner-shell::after {
+  bottom: 40px;
+  left: -80px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(125, 211, 252, 0.07), transparent 68%);
+}
+
+.planner-app {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.calendar-workspace {
+  width: 100%;
+  padding: 0 1.25rem;
+}
+
+.planner-app > .calendar-workspace {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.calendar-panel,
+.planner-modal {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.eyebrow {
+  display: inline-block;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+
+.stat-label {
+  display: block;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+
+.stat-value {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--accent-deep);
+}
+
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent) 0%, #ffcf86 100%);
+  border: none;
+  color: #271400;
+  font-weight: 700;
+  box-shadow: 0 14px 26px rgba(255, 180, 76, 0.2);
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+  background: linear-gradient(135deg, #ffb53d 0%, #ffd99f 100%);
+  color: #1d1000;
+}
+
+.btn-danger-soft {
+  background: linear-gradient(135deg, #fb7185 0%, #fda4af 100%);
+  border: none;
+  color: #30070d;
+  font-weight: 700;
+  box-shadow: 0 14px 26px rgba(248, 113, 113, 0.18);
+}
+
+.btn-danger-soft:hover,
+.btn-danger-soft:focus {
+  background: linear-gradient(135deg, #f43f5e 0%, #fecdd3 100%);
+  color: #220408;
+}
+

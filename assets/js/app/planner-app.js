@@ -1,5 +1,6 @@
 import { TaskManager } from "../managers/task-manager.js";
 import { StorageService } from "../services/storage-service.js";
+import { ConfirmModal } from "../ui/confirm-modal.js";
 import { TaskModal } from "../ui/task-modal.js";
 import { PlannerRenderer } from "../ui/planner-renderer.js";
 import { get } from "../utils/dom.js";
@@ -10,6 +11,7 @@ export class PlannerApp {
   constructor() {
     this.storage = new StorageService("monthly-planner-tasks");
     this.taskManager = new TaskManager(this.storage);
+    this.confirmModal = new ConfirmModal();
     this.activeMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     this.selectedDate = toISODate(new Date());
     this.draggedTaskId = null;
@@ -88,13 +90,20 @@ export class PlannerApp {
     }
   }
 
-  handleDeleteTask(taskId) {
+  async handleDeleteTask(taskId) {
     const task = this.taskManager.getById(taskId);
     if (!task) {
       return;
     }
 
-    const confirmed = window.confirm(`¿Eliminar la tarea "${task.title}"?`);
+    const confirmed = await this.confirmModal.ask({
+      eyebrow: "Eliminar tarea",
+      title: "¿Eliminar esta tarea?",
+      message: `La tarea "${task.title}" se eliminará del calendario. Esta acción no se puede deshacer.`,
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      danger: true,
+    });
     if (!confirmed) {
       return;
     }

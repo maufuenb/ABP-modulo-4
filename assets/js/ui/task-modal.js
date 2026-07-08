@@ -13,6 +13,7 @@ export class TaskModal {
     this.monthlyRecurrenceOptions = get("#monthlyRecurrenceOptions");
     this.recurrenceUntilGroup = get("#recurrenceUntilGroup");
     this.recurrenceEndToggle = get("#taskHasRecurrenceEnd");
+    this.colorSwatches = [...this.form.querySelectorAll(".task-color-swatch")];
     this.modal = new bootstrap.Modal(this.modalElement);
     this.fields = {
       id: get("#taskId"),
@@ -49,6 +50,17 @@ export class TaskModal {
       this.updateRecurrenceEndVisibility();
     });
 
+    this.fields.color.addEventListener("input", () => {
+      this.updateColorSelection();
+    });
+
+    this.colorSwatches.forEach((swatch) => {
+      swatch.addEventListener("click", () => {
+        this.fields.color.value = swatch.dataset.taskColor;
+        this.updateColorSelection();
+      });
+    });
+
     this.deleteButton.addEventListener("click", () => {
       const taskId = this.fields.id.value.trim();
       if (!taskId) {
@@ -69,6 +81,7 @@ export class TaskModal {
       this.submitButton.textContent = "Guardar";
       this.deleteButton.classList.add("d-none");
       this.clearRecurrenceSelections();
+      this.updateColorSelection();
       this.updateRecurrenceVisibility();
     });
   }
@@ -91,6 +104,7 @@ export class TaskModal {
     this.fields.description.value = task?.description || "";
     this.setCheckboxValues("recurrenceWeekdays", isOccurrenceEdit ? [] : task?.recurrenceWeekdays || []);
     this.setCheckboxValues("recurrenceMonths", isOccurrenceEdit ? [] : task?.recurrenceMonths || []);
+    this.updateColorSelection();
     this.updateRecurrenceVisibility();
     this.applyDefaultRecurrenceSelection();
     this.modal.show();
@@ -172,5 +186,12 @@ export class TaskModal {
     if (!showDateField) {
       this.fields.recurrenceUntil.value = "";
     }
+  }
+
+  updateColorSelection() {
+    const selectedColor = this.fields.color.value.toLowerCase();
+    this.colorSwatches.forEach((swatch) => {
+      swatch.classList.toggle("is-selected", swatch.dataset.taskColor.toLowerCase() === selectedColor);
+    });
   }
 }

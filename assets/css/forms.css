@@ -1,0 +1,260 @@
+﻿.form-control,
+.form-select,
+.form-control:focus,
+.form-select:focus {
+  background-color: rgba(12, 21, 39, 0.92);
+  border-color: rgba(168, 182, 204, 0.16);
+  color: var(--text-main);
+  box-shadow: none;
+  border-radius: 14px;
+  min-height: 48px;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-control:hover,
+.form-select:hover {
+  border-color: rgba(255, 180, 76, 0.26);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: rgba(255, 180, 76, 0.4);
+  box-shadow: 0 0 0 3px rgba(255, 180, 76, 0.1);
+}
+
+.form-select {
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--accent-deep) 50%),
+    linear-gradient(135deg, var(--accent-deep) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.25rem) 1.25rem,
+    calc(100% - 0.9rem) 1.25rem;
+  background-repeat: no-repeat;
+  background-size: 0.38rem 0.38rem, 0.38rem 0.38rem;
+  padding-right: 2.6rem;
+}
+
+input[type="date"].form-control,
+input[type="time"].form-control {
+  color-scheme: dark;
+  cursor: pointer;
+  padding-right: 0.85rem;
+}
+
+input[type="date"].form-control::-webkit-calendar-picker-indicator,
+input[type="time"].form-control::-webkit-calendar-picker-indicator {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background-color: rgba(255, 180, 76, 0.16);
+  cursor: pointer;
+  filter: invert(86%) sepia(22%) saturate(939%) hue-rotate(333deg) brightness(104%) contrast(101%);
+}
+
+input[type="date"].form-control::-webkit-calendar-picker-indicator:hover,
+input[type="time"].form-control::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(255, 180, 76, 0.24);
+}
+
+.form-label {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+.task-color-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.task-color-picker {
+  width: 100%;
+  max-width: 220px;
+  min-width: 150px;
+  height: 52px;
+  padding: 0.28rem;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.task-color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.task-color-picker::-webkit-color-swatch {
+  border: 0;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 0 18px rgba(255, 180, 76, 0.18);
+}
+
+.task-color-picker::-moz-color-swatch {
+  border: 0;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    0 0 18px rgba(255, 180, 76, 0.18);
+}
+
+.task-color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.task-color-swatch {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 255, 0.72), transparent 19%),
+    linear-gradient(135deg, color-mix(in srgb, var(--swatch-color) 82%, white), var(--swatch-color));
+  box-shadow:
+    inset 0 0 0 3px rgba(8, 15, 29, 0.6),
+    0 0 18px color-mix(in srgb, var(--swatch-color) 42%, transparent);
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.task-color-swatch:hover,
+.task-color-swatch:focus {
+  border-color: rgba(255, 255, 255, 0.46);
+  transform: translateY(-1px);
+}
+
+.task-color-swatch.is-selected {
+  border-color: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    inset 0 0 0 3px rgba(8, 15, 29, 0.72),
+    0 0 0 3px rgba(255, 255, 255, 0.08),
+    0 0 22px color-mix(in srgb, var(--swatch-color) 62%, transparent);
+}
+
+.task-color-hint {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.task-options-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.95fr) minmax(280px, 1.05fr);
+  gap: 1rem;
+  align-items: start;
+  padding: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.task-color-panel,
+.task-recurrence-end-panel {
+  min-width: 0;
+}
+
+.task-recurrence-end-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.recurrence-panel {
+  padding: 0.95rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.recurrence-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 48px;
+  padding: 0.8rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.recurrence-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.recurrence-grid {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.recurrence-grid-days {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.recurrence-grid-months {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.recurrence-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 58px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.recurrence-tile input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.recurrence-tile:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 180, 76, 0.22);
+}
+
+.recurrence-tile-short {
+  color: var(--accent-deep);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.recurrence-tile-label {
+  margin-top: 0.18rem;
+  color: var(--text-soft);
+  font-size: 0.76rem;
+  line-height: 1.15;
+}
+
+.recurrence-tile:has(input:checked) {
+  border-color: rgba(255, 180, 76, 0.3);
+  background: rgba(255, 180, 76, 0.12);
+  box-shadow: 0 0 0 1px rgba(255, 180, 76, 0.08);
+}
+
+.recurrence-tile:has(input:checked) .recurrence-tile-label {
+  color: var(--text-main);
+}
+

@@ -11,9 +11,17 @@
       <div class="modal-body">
         <form id="taskForm" class="task-form">
           <input type="hidden" id="taskId">
-          <div class="mb-3 task-field task-field-span-3">
+          <div class="mb-3 task-field task-field-span-2">
             <label for="taskTitle" class="form-label">Título</label>
             <input type="text" id="taskTitle" class="form-control" maxlength="60" required>
+          </div>
+          <div class="mb-3 task-field">
+            <label for="taskPriority" class="form-label">Prioridad</label>
+            <select id="taskPriority" class="form-select">
+              <option value="baja">Baja</option>
+              <option value="media" selected>Media</option>
+              <option value="alta">Alta</option>
+            </select>
           </div>
           <div class="mb-3 task-field">
             <label for="taskDate" class="form-label">Fecha</label>
@@ -24,21 +32,6 @@
             <input type="time" id="taskTime" class="form-control">
           </div>
           <div class="mb-3 task-field">
-            <label for="taskPriority" class="form-label">Prioridad</label>
-            <select id="taskPriority" class="form-select">
-              <option value="baja">Baja</option>
-              <option value="media" selected>Media</option>
-              <option value="alta">Alta</option>
-            </select>
-          </div>
-          <div class="mb-3 task-field task-field-span-2">
-            <label for="taskColor" class="form-label">Color</label>
-            <div class="task-color-row">
-              <input type="color" id="taskColor" class="form-control form-control-color task-color-picker"
-                value="#ffb44c" title="Selecciona un color para la tarea">
-            </div>
-          </div>
-          <div class="mb-3 task-field">
             <label for="taskRecurrenceType" class="form-label">Repetición</label>
             <select id="taskRecurrenceType" class="form-select">
               <option value="none" selected>No repetir</option>
@@ -46,12 +39,32 @@
               <option value="monthly">Mensual</option>
             </select>
           </div>
-          <div id="recurrenceUntilGroup" class="mb-3 d-none task-field task-field-span-2">
-            <label class="recurrence-toggle">
-              <input type="checkbox" id="taskHasRecurrenceEnd">
-              <span>Terminar repetición después de</span>
-            </label>
-            <input type="date" id="taskRecurrenceUntil" class="form-control mt-2 d-none">
+          <div class="mb-3 task-field task-field-span-3 task-options-row">
+            <div class="task-color-panel">
+              <label for="taskColor" class="form-label">Color</label>
+              <div class="task-color-row">
+                <input type="color" id="taskColor" class="form-control form-control-color task-color-picker"
+                  value="#ffb44c" title="Selecciona un color para la tarea">
+              </div>
+              <div class="task-color-swatches" aria-label="Colores sugeridos">
+                <button type="button" class="task-color-swatch" data-task-color="#ffb44c" style="--swatch-color: #ffb44c;" aria-label="Color ámbar"></button>
+                <button type="button" class="task-color-swatch" data-task-color="#7dd3fc" style="--swatch-color: #7dd3fc;" aria-label="Color celeste"></button>
+                <button type="button" class="task-color-swatch" data-task-color="#34d399" style="--swatch-color: #34d399;" aria-label="Color verde"></button>
+                <button type="button" class="task-color-swatch" data-task-color="#f472b6" style="--swatch-color: #f472b6;" aria-label="Color rosado"></button>
+                <button type="button" class="task-color-swatch" data-task-color="#a78bfa" style="--swatch-color: #a78bfa;" aria-label="Color lila"></button>
+                <button type="button" class="task-color-swatch" data-task-color="#fb7185" style="--swatch-color: #fb7185;" aria-label="Color coral"></button>
+                <button type="button" class="task-color-swatch" data-task-color="#facc15" style="--swatch-color: #facc15;" aria-label="Color amarillo"></button>
+                <button type="button" class="task-color-swatch" data-task-color="#cbd5e1" style="--swatch-color: #cbd5e1;" aria-label="Color gris claro"></button>
+              </div>
+            </div>
+            <div id="recurrenceUntilGroup" class="d-none task-recurrence-end-panel">
+              <span class="form-label d-block">Fin de repetición</span>
+              <label class="recurrence-toggle">
+                <input type="checkbox" id="taskHasRecurrenceEnd">
+                <span>Terminar repetición después de</span>
+              </label>
+              <input type="date" id="taskRecurrenceUntil" class="form-control mt-2 d-none">
+            </div>
           </div>
           <div id="weeklyRecurrenceOptions" class="recurrence-panel d-none mb-3 task-field task-field-span-3">
             <span class="form-label d-block mb-2">Días de repetición</span>
