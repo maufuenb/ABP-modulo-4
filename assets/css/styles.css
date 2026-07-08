@@ -418,26 +418,6 @@ body {
   gap: 0.7rem;
 }
 
-.agenda-day-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.agenda-day-title {
-  margin: 0;
-  color: var(--text-main);
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.agenda-day-count {
-  color: var(--text-muted);
-  font-size: 0.76rem;
-}
-
 .agenda-card {
   display: grid;
   grid-template-columns: 74px minmax(0, 1fr);

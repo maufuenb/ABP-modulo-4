@@ -249,18 +249,6 @@ export class PlannerRenderer {
     }
 
     const section = create("section", { className: "agenda-day-group" });
-    const heading = create("div", { className: "agenda-day-heading" });
-    const title = create("h4", {
-      className: "agenda-day-title",
-      text: formattedDay,
-    });
-    const count = create("span", {
-      className: "agenda-day-count",
-      text: `${selectedTasks.length} ${selectedTasks.length === 1 ? "tarea" : "tareas"}`,
-    });
-
-    heading.append(title, count);
-    section.append(heading);
     selectedTasks.forEach((task) => section.append(this.createAgendaCard(task)));
     this.agendaList.append(section);
   }
