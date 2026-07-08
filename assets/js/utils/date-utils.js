@@ -29,7 +29,7 @@ export const formatDate = (date, options) => {
 export const getMonthName = (date) => formatDate(date, { month: "long", year: "numeric" });
 
 export const getWeekdayNames = () => {
-  const baseDate = new Date(2026, 0, 4);
+  const baseDate = new Date(2026, 0, 5);
   return Array.from({ length: 7 }, (_, index) =>
     formatDate(addDays(baseDate, index), { weekday: "long" })
   );

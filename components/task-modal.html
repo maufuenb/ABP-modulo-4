@@ -1,0 +1,141 @@
+<div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl task-modal-dialog">
+    <div class="modal-content planner-modal">
+      <div class="modal-header border-0 pb-0">
+        <div>
+          <span class="eyebrow">Gestión de tareas</span>
+          <h2 class="modal-title fs-4 mt-1" id="taskModalLabel">Nueva tarea</h2>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="taskForm" class="task-form">
+          <input type="hidden" id="taskId">
+          <div class="mb-3 task-field task-field-span-3">
+            <label for="taskTitle" class="form-label">Título</label>
+            <input type="text" id="taskTitle" class="form-control" maxlength="60" required>
+          </div>
+          <div class="mb-3 task-field">
+            <label for="taskDate" class="form-label">Fecha</label>
+            <input type="date" id="taskDate" class="form-control" required>
+          </div>
+          <div class="mb-3 task-field">
+            <label for="taskTime" class="form-label">Hora</label>
+            <input type="time" id="taskTime" class="form-control">
+          </div>
+          <div class="mb-3 task-field">
+            <label for="taskPriority" class="form-label">Prioridad</label>
+            <select id="taskPriority" class="form-select">
+              <option value="baja">Baja</option>
+              <option value="media" selected>Media</option>
+              <option value="alta">Alta</option>
+            </select>
+          </div>
+          <div class="mb-3 task-field task-field-span-2">
+            <label for="taskColor" class="form-label">Color</label>
+            <div class="task-color-row">
+              <input type="color" id="taskColor" class="form-control form-control-color task-color-picker"
+                value="#ffb44c" title="Selecciona un color para la tarea">
+            </div>
+          </div>
+          <div class="mb-3 task-field">
+            <label for="taskRecurrenceType" class="form-label">Repetición</label>
+            <select id="taskRecurrenceType" class="form-select">
+              <option value="none" selected>No repetir</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
+          </div>
+          <div id="recurrenceUntilGroup" class="mb-3 d-none task-field task-field-span-2">
+            <label class="recurrence-toggle">
+              <input type="checkbox" id="taskHasRecurrenceEnd">
+              <span>Terminar repetición después de</span>
+            </label>
+            <input type="date" id="taskRecurrenceUntil" class="form-control mt-2 d-none">
+          </div>
+          <div id="weeklyRecurrenceOptions" class="recurrence-panel d-none mb-3 task-field task-field-span-3">
+            <span class="form-label d-block mb-2">Días de repetición</span>
+            <div class="recurrence-grid recurrence-grid-days">
+              <label class="recurrence-tile">
+                <input type="checkbox" name="recurrenceWeekdays" value="0">
+                <span class="recurrence-tile-short">Lun</span>
+                <span class="recurrence-tile-label">Lunes</span>
+              </label>
+              <label class="recurrence-tile">
+                <input type="checkbox" name="recurrenceWeekdays" value="1">
+                <span class="recurrence-tile-short">Mar</span>
+                <span class="recurrence-tile-label">Martes</span>
+              </label>
+              <label class="recurrence-tile">
+                <input type="checkbox" name="recurrenceWeekdays" value="2">
+                <span class="recurrence-tile-short">Mié</span>
+                <span class="recurrence-tile-label">Miércoles</span>
+              </label>
+              <label class="recurrence-tile">
+                <input type="checkbox" name="recurrenceWeekdays" value="3">
+                <span class="recurrence-tile-short">Jue</span>
+                <span class="recurrence-tile-label">Jueves</span>
+              </label>
+              <label class="recurrence-tile">
+                <input type="checkbox" name="recurrenceWeekdays" value="4">
+                <span class="recurrence-tile-short">Vie</span>
+                <span class="recurrence-tile-label">Viernes</span>
+              </label>
+              <label class="recurrence-tile">
+                <input type="checkbox" name="recurrenceWeekdays" value="5">
+                <span class="recurrence-tile-short">Sáb</span>
+                <span class="recurrence-tile-label">Sábado</span>
+              </label>
+              <label class="recurrence-tile">
+                <input type="checkbox" name="recurrenceWeekdays" value="6">
+                <span class="recurrence-tile-short">Dom</span>
+                <span class="recurrence-tile-label">Domingo</span>
+              </label>
+            </div>
+          </div>
+          <div id="monthlyRecurrenceOptions" class="recurrence-panel d-none mb-3 task-field task-field-span-3">
+            <span class="form-label d-block mb-2">Meses permitidos</span>
+            <div class="recurrence-grid recurrence-grid-months">
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="1"><span
+                  class="recurrence-tile-short">Ene</span><span class="recurrence-tile-label">Enero</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="2"><span
+                  class="recurrence-tile-short">Feb</span><span class="recurrence-tile-label">Febrero</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="3"><span
+                  class="recurrence-tile-short">Mar</span><span class="recurrence-tile-label">Marzo</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="4"><span
+                  class="recurrence-tile-short">Abr</span><span class="recurrence-tile-label">Abril</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="5"><span
+                  class="recurrence-tile-short">May</span><span class="recurrence-tile-label">Mayo</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="6"><span
+                  class="recurrence-tile-short">Jun</span><span class="recurrence-tile-label">Junio</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="7"><span
+                  class="recurrence-tile-short">Jul</span><span class="recurrence-tile-label">Julio</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="8"><span
+                  class="recurrence-tile-short">Ago</span><span class="recurrence-tile-label">Agosto</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="9"><span
+                  class="recurrence-tile-short">Sep</span><span class="recurrence-tile-label">Septiembre</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="10"><span
+                  class="recurrence-tile-short">Oct</span><span class="recurrence-tile-label">Octubre</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="11"><span
+                  class="recurrence-tile-short">Nov</span><span class="recurrence-tile-label">Noviembre</span></label>
+              <label class="recurrence-tile"><input type="checkbox" name="recurrenceMonths" value="12"><span
+                  class="recurrence-tile-short">Dic</span><span class="recurrence-tile-label">Diciembre</span></label>
+            </div>
+          </div>
+          <div class="mb-3 task-field task-field-span-3">
+            <label for="taskDescription" class="form-label">Descripción</label>
+            <textarea id="taskDescription" class="form-control" rows="4" maxlength="240"
+              placeholder="Añade detalles útiles para esta tarea"></textarea>
+          </div>
+          <div class="d-flex gap-2 justify-content-between pt-2 task-form-actions">
+            <button type="button" id="deleteTaskButton" class="btn btn-outline-danger d-none">Eliminar</button>
+            <div class="d-flex gap-2 ms-auto">
+            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" id="taskSubmitButton" class="btn btn-accent">Guardar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -36,6 +36,10 @@ const normalizeNumericList = (values, min, max) =>
   [...new Set((Array.isArray(values) ? values : []).map(Number).filter((value) => value >= min && value <= max))]
     .sort((first, second) => first - second);
 
+const normalizeDateList = (values) =>
+  [...new Set((Array.isArray(values) ? values : []).filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(value)))]
+    .sort();
+
 export const normalizeTaskData = (taskData) => {
   const recurrenceType = taskData.recurrenceType || "none";
   const recurrenceUntil =
@@ -43,7 +47,7 @@ export const normalizeTaskData = (taskData) => {
       ? taskData.recurrenceUntil
       : "";
 
-  return {
+  const normalizedTask = {
     title: taskData.title,
     date: taskData.date,
     time: taskData.time,
@@ -57,6 +61,12 @@ export const normalizeTaskData = (taskData) => {
       recurrenceType === "monthly" ? normalizeNumericList(taskData.recurrenceMonths, 1, 12) : [],
     recurrenceUntil,
   };
+
+  if (Array.isArray(taskData.recurrenceExceptions)) {
+    normalizedTask.recurrenceExceptions = normalizeDateList(taskData.recurrenceExceptions);
+  }
+
+  return normalizedTask;
 };
 
 export const buildTasksByDateMap = (tasks) =>
@@ -89,8 +99,10 @@ const expandWeeklyTask = (task, rangeStart, rangeEnd) => {
   const occurrences = [];
 
   for (let cursor = new Date(effectiveStart); cursor <= effectiveEnd; cursor = addDays(cursor, 1)) {
-    if (selectedWeekdays.includes(getWeekdayIndex(cursor))) {
-      occurrences.push(buildOccurrence(task, toISODate(cursor)));
+    const dateISO = toISODate(cursor);
+
+    if (selectedWeekdays.includes(getWeekdayIndex(cursor)) && !task.recurrenceExceptions?.includes(dateISO)) {
+      occurrences.push(buildOccurrence(task, dateISO));
     }
   }
 
@@ -112,9 +124,15 @@ const expandMonthlyTask = (task, rangeStart, rangeEnd) => {
     if (targetMonths.includes(monthNumber)) {
       const safeDay = Math.min(targetDay, getDaysInMonth(cursor.getFullYear(), cursor.getMonth()));
       const occurrenceDate = new Date(cursor.getFullYear(), cursor.getMonth(), safeDay);
+      const occurrenceISO = toISODate(occurrenceDate);
 
-      if (occurrenceDate >= startDate && occurrenceDate >= rangeStart && occurrenceDate <= effectiveEnd) {
-        occurrences.push(buildOccurrence(task, toISODate(occurrenceDate)));
+      if (
+        occurrenceDate >= startDate &&
+        occurrenceDate >= rangeStart &&
+        occurrenceDate <= effectiveEnd &&
+        !task.recurrenceExceptions?.includes(occurrenceISO)
+      ) {
+        occurrences.push(buildOccurrence(task, occurrenceISO));
       }
     }
 

@@ -1,19 +1,18 @@
 import { create, get } from "../utils/dom.js";
 import { formatDate, getCalendarDays, getMonthName, getWeekdayNames } from "../utils/date-utils.js";
+import { getChileHoliday, isSunday } from "../utils/holiday-utils.js";
 import { getTaskColorStyle } from "../utils/task-helpers.js";
 
 export class PlannerRenderer {
   constructor({ onAddTask, onEditTask, onDeleteTask, onDropTask, onSelectDate }) {
     this.calendarGrid = get("#calendarGrid");
     this.calendarWeekdays = get("#calendarWeekdays");
-    this.todayAlertContainer = get("#todayAlertContainer");
     this.monthLabel = get("#currentMonthLabel");
-    this.monthTaskCount = get("#monthTaskCount");
-    this.todayTaskCount = get("#todayTaskCount");
     this.agendaList = get("#agendaList");
     this.agendaTaskCount = get("#agendaTaskCount");
     this.agendaTitle = get("#agendaTitle");
     this.agendaCopy = get("#agendaCopy");
+    this.expandedAgendaTaskId = null;
     this.onAddTask = onAddTask;
     this.onEditTask = onEditTask;
     this.onDeleteTask = onDeleteTask;
@@ -33,33 +32,45 @@ export class PlannerRenderer {
     });
   }
 
-  renderCalendar({ activeMonth, tasksByDate, monthTasks, todayTasks, selectedDate, selectedTasks }) {
+  renderCalendar({ activeMonth, tasksByDate, selectedDate, selectedTasks }) {
     const calendarDays = getCalendarDays(activeMonth);
     this.monthLabel.textContent = getMonthName(activeMonth);
-    this.monthTaskCount.textContent = String(monthTasks.length);
-    this.todayTaskCount.textContent = String(todayTasks.length);
     this.calendarGrid.innerHTML = "";
 
     calendarDays.forEach((day) => {
       const tasks = tasksByDate.get(day.iso) || [];
+      const holidayName = getChileHoliday(day.date);
+      const isRestDay = isSunday(day.date) || Boolean(holidayName);
       const dayCard = create("article", {
-        className: `calendar-day${day.isCurrentMonth ? "" : " is-outside"}${day.isToday ? " is-today" : ""}${day.iso === selectedDate ? " is-selected" : ""}`,
+        className: `calendar-day${day.isCurrentMonth ? "" : " is-outside"}${day.isToday ? " is-today" : ""}${day.iso === selectedDate ? " is-selected" : ""}${tasks.length ? "" : " is-empty"}${isSunday(day.date) ? " is-sunday" : ""}${holidayName ? " is-holiday" : ""}`,
         dataset: { date: day.iso },
-        attributes: { tabindex: "0", role: "button", "aria-label": `Seleccionar día ${day.iso}` },
+        attributes: {
+          tabindex: "0",
+          role: "button",
+          "aria-label": `${holidayName || isRestDay ? "Día destacado. " : ""}Seleccionar día ${day.iso}${holidayName ? `. Festivo: ${holidayName}` : ""}`,
+          title: holidayName || (isRestDay ? "Domingo" : ""),
+        },
       });
 
-      dayCard.append(this.createDayHeader(day, tasks.length));
+      dayCard.append(this.createDayHeader(day, tasks.length, holidayName));
       dayCard.append(this.createTaskList(day.iso, tasks));
+      if (holidayName) {
+        dayCard.append(
+          create("p", {
+            className: "day-holiday-reason",
+            text: holidayName,
+          })
+        );
+      }
       this.attachDropZone(dayCard);
       this.attachDaySelection(dayCard);
       this.calendarGrid.append(dayCard);
     });
 
     this.renderAgenda(selectedDate, selectedTasks);
-    this.renderTodayAlert(todayTasks);
   }
 
-  createDayHeader(day, taskCount) {
+  createDayHeader(day, taskCount, holidayName = "") {
     const wrapper = create("div", { className: "day-header" });
     const dayNumber = create("span", { className: "day-number", text: String(day.date.getDate()) });
     const meta = create("div", { className: "day-meta" });
@@ -94,9 +105,9 @@ export class PlannerRenderer {
       dataset: { taskId: task.id },
       attributes: {
         draggable: "true",
-        role: "button",
-        tabindex: "0",
-        "aria-label": `Editar tarea ${task.title}`,
+        role: "presentation",
+        tabindex: "-1",
+        "aria-label": `Tarea ${task.title}`,
         title: task.title,
         style: getTaskColorStyle(task),
       },
@@ -107,19 +118,6 @@ export class PlannerRenderer {
     card.addEventListener("dragstart", (event) => {
       event.dataTransfer.setData("text/plain", task.id);
       event.dataTransfer.effectAllowed = "move";
-    });
-
-    card.addEventListener("click", (event) => {
-      event.stopPropagation();
-      this.onEditTask(task.id);
-    });
-
-    card.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        event.stopPropagation();
-        this.onEditTask(task.id);
-      }
     });
 
     card.append(title);
@@ -150,7 +148,7 @@ export class PlannerRenderer {
 
   attachDaySelection(dayCard) {
     dayCard.addEventListener("click", (event) => {
-      if (event.target.closest(".task-card, .task-action, .task-add-button")) {
+      if (event.target.closest(".task-action, .task-add-button")) {
         return;
       }
 
@@ -206,61 +204,78 @@ export class PlannerRenderer {
       dataset: { taskId: task.id },
       attributes: { style: getTaskColorStyle(task) },
     });
+    const aside = create("div", { className: "agenda-card-aside-column" });
     const time = create("div", {
       className: "agenda-time",
       text: task.time || "Todo el dia",
     });
     const body = create("div", { className: "agenda-card-body" });
     const title = create("h5", { className: "agenda-card-title", text: task.title });
-    const priority = create("span", {
-      className: "agenda-priority-badge",
-      text: task.priority,
+    const summary = create("div", { className: "agenda-card-summary" });
+    const editButton = create("button", {
+      className: "agenda-icon-button",
+      html: `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 20h4l10.5-10.5-4-4L4 16v4zm13.7-11.3 1.6-1.6a1 1 0 0 0 0-1.4l-1.3-1.3a1 1 0 0 0-1.4 0L15 6.1l2.7 2.6z"/>
+        </svg>
+      `,
+      attributes: { type: "button", "aria-label": `Editar tarea ${task.title}`, title: "Editar" },
     });
-    const meta = create("div", { className: "agenda-card-meta" });
-    meta.append(priority);
 
-    body.append(title, meta);
+    editButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      this.onEditTask(task.id);
+    });
 
-    if (task.description) {
-      body.append(create("p", { className: "agenda-card-description", text: task.description }));
+    summary.append(title, editButton);
+
+    body.append(summary);
+    if (this.expandedAgendaTaskId === task.id) {
+      const { meta, description } = this.createAgendaDetails(task);
+      aside.append(meta);
+      if (description) {
+        body.append(description);
+      }
     }
 
-    const actions = create("div", { className: "agenda-card-actions" });
-    const editButton = create("button", {
-      className: "task-action",
-      text: "Editar",
-      attributes: { type: "button" },
-    });
-    const deleteButton = create("button", {
-      className: "task-action",
-      text: "Eliminar",
-      attributes: { type: "button" },
+    aside.prepend(time);
+    card.append(aside, body);
+
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("button, input, select, textarea, label")) {
+        return;
+      }
+
+      this.expandedAgendaTaskId = this.expandedAgendaTaskId === task.id ? null : task.id;
+      this.onSelectDate(task.date);
     });
 
-    editButton.addEventListener("click", () => this.onEditTask(task.id));
-    deleteButton.addEventListener("click", () => this.onDeleteTask(task.id));
-
-    actions.append(editButton, deleteButton);
-    body.append(actions);
-    card.append(time, body);
     return card;
   }
 
-  renderTodayAlert(todayTasks) {
-    this.todayAlertContainer.innerHTML = "";
-    if (!todayTasks.length) {
-      return;
+  createAgendaDetails(task) {
+    const meta = create("div", { className: "agenda-card-meta" });
+    meta.append(
+      create("span", { className: "agenda-priority-badge", text: task.priority }),
+      create("span", {
+        className: "agenda-priority-badge agenda-secondary-badge",
+        text: this.getRecurrenceLabel(task),
+      })
+    );
+
+    return {
+      meta,
+      description: task.description
+        ? create("p", { className: "agenda-card-description", text: task.description })
+        : null,
+    };
+  }
+
+  getRecurrenceLabel(task) {
+    if (!task.recurrenceType || task.recurrenceType === "none") {
+      return "Unica";
     }
 
-    const list = todayTasks
-      .map((task) => `${task.time ? `${task.time} · ` : ""}${task.title}`)
-      .join(" | ");
-
-    const alert = create("div", {
-      className: "alert today-alert mb-0",
-      html: `<strong>Recordatorio de hoy:</strong> ${list}`,
-    });
-
-    this.todayAlertContainer.append(alert);
+    return task.recurrenceType === "weekly" ? "Semanal" : "Mensual";
   }
 }

@@ -1,0 +1,36 @@
+<section class="planner-app py-4 py-lg-5">
+  <section class="calendar-workspace">
+    <section class="calendar-panel">
+      <div class="calendar-panel-header">
+        <div>
+          <span class="eyebrow">Vista mensual</span>
+          <h1 id="currentMonthLabel" class="calendar-title mb-0">Calendario</h1>
+        </div>
+        <div class="calendar-header-actions">
+          <div class="month-navigation" aria-label="Navegación de meses">
+            <button type="button" id="previousMonthButton" class="month-nav-button" aria-label="Mes anterior">‹</button>
+            <button type="button" id="todayButton" class="btn btn-outline-light">Hoy</button>
+            <button type="button" id="nextMonthButton" class="month-nav-button" aria-label="Mes siguiente">›</button>
+          </div>
+        </div>
+      </div>
+      <div class="calendar-layout">
+        <div class="calendar-main">
+          <div class="calendar-weekdays" id="calendarWeekdays"></div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+        <aside class="agenda-sidebar">
+          <div class="agenda-sidebar-header">
+            <div>
+              <span class="eyebrow">Agenda lateral</span>
+              <h3 id="agendaTitle" class="agenda-title mb-0">Reuniones y tareas</h3>
+            </div>
+            <span id="agendaTaskCount" class="agenda-count">0 registros</span>
+          </div>
+          <p id="agendaCopy" class="agenda-copy">Selecciona un día del calendario para ver su agenda por hora.</p>
+          <div id="agendaList" class="agenda-list" aria-live="polite"></div>
+        </aside>
+      </div>
+    </section>
+  </section>
+</section>

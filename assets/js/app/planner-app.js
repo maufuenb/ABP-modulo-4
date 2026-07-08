@@ -1,23 +1,21 @@
-import { AlertService } from "../services/alert-service.js";
 import { TaskManager } from "../managers/task-manager.js";
 import { StorageService } from "../services/storage-service.js";
 import { TaskModal } from "../ui/task-modal.js";
 import { PlannerRenderer } from "../ui/planner-renderer.js";
 import { get } from "../utils/dom.js";
-import { fromMonthValue, getCalendarDays, toISODate, toMonthValue } from "../utils/date-utils.js";
+import { getCalendarDays, toISODate } from "../utils/date-utils.js";
 import { buildTasksByDateMap, normalizeTaskData, sortTasksByTime } from "../utils/task-helpers.js";
 
 export class PlannerApp {
   constructor() {
     this.storage = new StorageService("monthly-planner-tasks");
     this.taskManager = new TaskManager(this.storage);
-    this.alertService = new AlertService(this.storage);
     this.activeMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     this.selectedDate = toISODate(new Date());
     this.draggedTaskId = null;
-    this.monthPicker = get("#monthPicker");
+    this.previousMonthButton = get("#previousMonthButton");
+    this.nextMonthButton = get("#nextMonthButton");
     this.todayButton = get("#todayButton");
-    this.newTaskButton = get("#newTaskButton");
 
     this.renderer = new PlannerRenderer({
       onAddTask: (selectedDate) => this.taskModal.open(null, selectedDate),
@@ -26,33 +24,32 @@ export class PlannerApp {
       onDropTask: (taskId, date) => this.handleDropTask(taskId, date),
       onSelectDate: (date) => this.handleSelectDate(date),
     });
-    this.taskModal = new TaskModal((taskData) => this.handleTaskSubmit(taskData));
+    this.taskModal = new TaskModal(
+      (taskData) => this.handleTaskSubmit(taskData),
+      (taskId) => this.handleDeleteTask(taskId)
+    );
   }
 
   init() {
     this.renderer.renderWeekdays();
-    this.monthPicker.value = toMonthValue(this.activeMonth);
     this.bindEvents();
     this.render();
     this.scheduleTodayRefresh();
   }
 
   bindEvents() {
-    this.monthPicker.addEventListener("change", (event) => {
-      this.activeMonth = fromMonthValue(event.target.value);
-      this.selectedDate = this.getDefaultSelectedDate(this.activeMonth);
-      this.render();
+    this.previousMonthButton.addEventListener("click", () => {
+      this.goToRelativeMonth(-1);
+    });
+
+    this.nextMonthButton.addEventListener("click", () => {
+      this.goToRelativeMonth(1);
     });
 
     this.todayButton.addEventListener("click", () => {
       this.activeMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-      this.monthPicker.value = toMonthValue(this.activeMonth);
       this.selectedDate = toISODate(new Date());
       this.render();
-    });
-
-    this.newTaskButton.addEventListener("click", () => {
-      this.taskModal.open(null, this.selectedDate);
     });
 
     document.addEventListener("dragstart", (event) => {
@@ -64,6 +61,12 @@ export class PlannerApp {
     });
   }
 
+  goToRelativeMonth(offset) {
+    this.activeMonth = new Date(this.activeMonth.getFullYear(), this.activeMonth.getMonth() + offset, 1);
+    this.selectedDate = this.getDefaultSelectedDate(this.activeMonth);
+    this.render();
+  }
+
   handleTaskSubmit(taskData) {
     const normalizedTask = normalizeTaskData(taskData);
 
@@ -73,9 +76,8 @@ export class PlannerApp {
       this.taskManager.create(normalizedTask);
     }
 
-    this.activeMonth = fromMonthValue(taskData.date.slice(0, 7));
+    this.activeMonth = new Date(Number(taskData.date.slice(0, 4)), Number(taskData.date.slice(5, 7)) - 1, 1);
     this.selectedDate = taskData.date;
-    this.monthPicker.value = toMonthValue(this.activeMonth);
     this.render();
   }
 
@@ -131,21 +133,15 @@ export class PlannerApp {
   }
 
   render() {
-    const monthValue = toMonthValue(this.activeMonth);
-    const monthTasks = this.taskManager.getByMonth(monthValue);
-    const todayTasks = this.taskManager.getByDate(toISODate(new Date()));
     const tasksByDate = this.getTasksByDate();
     const selectedTasks = this.taskManager.getByDate(this.selectedDate);
 
     this.renderer.renderCalendar({
       activeMonth: this.activeMonth,
       tasksByDate,
-      monthTasks,
-      todayTasks,
       selectedDate: this.selectedDate,
       selectedTasks,
     });
-    this.alertService.notifyTodayTasks(todayTasks);
   }
 
   getDefaultSelectedDate(activeMonth) {

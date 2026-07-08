@@ -1,16 +1,18 @@
 import { get } from "../utils/dom.js";
 
 export class TaskModal {
-  constructor(onSubmit) {
+  constructor(onSubmit, onDelete) {
     this.onSubmit = onSubmit;
+    this.onDelete = onDelete;
     this.form = get("#taskForm");
     this.modalElement = get("#taskModal");
     this.modalTitle = get("#taskModalLabel");
+    this.deleteButton = get("#deleteTaskButton");
+    this.submitButton = get("#taskSubmitButton");
     this.weeklyRecurrenceOptions = get("#weeklyRecurrenceOptions");
     this.monthlyRecurrenceOptions = get("#monthlyRecurrenceOptions");
     this.recurrenceUntilGroup = get("#recurrenceUntilGroup");
     this.recurrenceEndToggle = get("#taskHasRecurrenceEnd");
-    this.tomSelectInstances = [];
     this.modal = new bootstrap.Modal(this.modalElement);
     this.fields = {
       id: get("#taskId"),
@@ -20,13 +22,10 @@ export class TaskModal {
       priority: get("#taskPriority"),
       color: get("#taskColor"),
       recurrenceType: get("#taskRecurrenceType"),
-      recurrenceWeekdays: get("#taskRecurrenceWeekdays"),
-      recurrenceMonths: get("#taskRecurrenceMonths"),
       recurrenceUntil: get("#taskRecurrenceUntil"),
       description: get("#taskDescription"),
     };
 
-    this.setupEnhancedSelects();
     this.bindEvents();
   }
 
@@ -50,6 +49,16 @@ export class TaskModal {
       this.updateRecurrenceEndVisibility();
     });
 
+    this.deleteButton.addEventListener("click", () => {
+      const taskId = this.fields.id.value.trim();
+      if (!taskId) {
+        return;
+      }
+
+      this.close();
+      this.onDelete(taskId);
+    });
+
     this.modalElement.addEventListener("hidden.bs.modal", () => {
       this.form.reset();
       this.fields.id.value = "";
@@ -57,6 +66,8 @@ export class TaskModal {
       this.fields.color.value = "#ffb44c";
       this.fields.recurrenceType.value = "none";
       this.recurrenceEndToggle.checked = false;
+      this.submitButton.textContent = "Guardar";
+      this.deleteButton.classList.add("d-none");
       this.clearRecurrenceSelections();
       this.updateRecurrenceVisibility();
     });
@@ -64,19 +75,22 @@ export class TaskModal {
 
   open(task = null, selectedDate = "") {
     const isEditing = Boolean(task);
+    const isOccurrenceEdit = Boolean(task?.isRecurringOccurrence);
     this.modalTitle.textContent = isEditing ? "Editar tarea" : "Nueva tarea";
+    this.submitButton.textContent = isEditing ? "Actualizar" : "Guardar";
+    this.deleteButton.classList.toggle("d-none", !isEditing);
     this.fields.id.value = task?.id || "";
     this.fields.title.value = task?.title || "";
     this.fields.date.value = task?.date || selectedDate;
     this.fields.time.value = task?.time || "";
     this.fields.priority.value = task?.priority || "media";
     this.fields.color.value = task?.color || "#ffb44c";
-    this.fields.recurrenceType.value = task?.recurrenceType || "none";
-    this.fields.recurrenceUntil.value = task?.recurrenceUntil || "";
-    this.recurrenceEndToggle.checked = Boolean(task?.recurrenceUntil);
+    this.fields.recurrenceType.value = isOccurrenceEdit ? "none" : task?.recurrenceType || "none";
+    this.fields.recurrenceUntil.value = isOccurrenceEdit ? "" : task?.recurrenceUntil || "";
+    this.recurrenceEndToggle.checked = !isOccurrenceEdit && Boolean(task?.recurrenceUntil);
     this.fields.description.value = task?.description || "";
-    this.setSelectValues(this.fields.recurrenceWeekdays, task?.recurrenceWeekdays || []);
-    this.setSelectValues(this.fields.recurrenceMonths, task?.recurrenceMonths || []);
+    this.setCheckboxValues("recurrenceWeekdays", isOccurrenceEdit ? [] : task?.recurrenceWeekdays || []);
+    this.setCheckboxValues("recurrenceMonths", isOccurrenceEdit ? [] : task?.recurrenceMonths || []);
     this.updateRecurrenceVisibility();
     this.applyDefaultRecurrenceSelection();
     this.modal.show();
@@ -95,8 +109,8 @@ export class TaskModal {
       priority: this.fields.priority.value,
       color: this.fields.color.value,
       recurrenceType: this.fields.recurrenceType.value,
-      recurrenceWeekdays: this.getSelectValues(this.fields.recurrenceWeekdays),
-      recurrenceMonths: this.getSelectValues(this.fields.recurrenceMonths),
+      recurrenceWeekdays: this.getCheckboxValues("recurrenceWeekdays"),
+      recurrenceMonths: this.getCheckboxValues("recurrenceMonths"),
       recurrenceUntil: this.recurrenceEndToggle.checked ? this.fields.recurrenceUntil.value : "",
       description: this.fields.description.value.trim(),
     };
@@ -122,43 +136,32 @@ export class TaskModal {
       return;
     }
 
-    if (this.fields.recurrenceType.value === "weekly" && !this.getSelectValues(this.fields.recurrenceWeekdays).length) {
+    if (this.fields.recurrenceType.value === "weekly" && !this.getCheckboxValues("recurrenceWeekdays").length) {
       const selectedDate = new Date(`${this.fields.date.value}T12:00:00`);
       const weekday = (selectedDate.getDay() + 6) % 7;
-      this.setSelectValues(this.fields.recurrenceWeekdays, [weekday]);
+      this.setCheckboxValues("recurrenceWeekdays", [weekday]);
     }
 
-    if (this.fields.recurrenceType.value === "monthly" && !this.getSelectValues(this.fields.recurrenceMonths).length) {
+    if (this.fields.recurrenceType.value === "monthly" && !this.getCheckboxValues("recurrenceMonths").length) {
       const selectedDate = new Date(`${this.fields.date.value}T12:00:00`);
-      this.setSelectValues(this.fields.recurrenceMonths, [selectedDate.getMonth() + 1]);
+      this.setCheckboxValues("recurrenceMonths", [selectedDate.getMonth() + 1]);
     }
   }
 
-  getSelectValues(field) {
-    if (field.tomselect) {
-      const value = field.tomselect.getValue();
-      return Array.isArray(value) ? value : value ? String(value).split(",") : [];
-    }
-
-    return [...field.selectedOptions].map((option) => option.value);
+  getCheckboxValues(name) {
+    return [...this.form.querySelectorAll(`input[name="${name}"]:checked`)].map((input) => input.value);
   }
 
-  setSelectValues(field, values) {
+  setCheckboxValues(name, values) {
     const normalized = new Set((values || []).map(String));
-    const selectedValues = [...normalized];
-
-    [...field.options].forEach((option) => {
-      option.selected = normalized.has(option.value);
+    this.form.querySelectorAll(`input[name="${name}"]`).forEach((input) => {
+      input.checked = normalized.has(input.value);
     });
-
-    if (field.tomselect) {
-      field.tomselect.setValue(selectedValues, true);
-    }
   }
 
   clearRecurrenceSelections() {
-    this.setSelectValues(this.fields.recurrenceWeekdays, []);
-    this.setSelectValues(this.fields.recurrenceMonths, []);
+    this.setCheckboxValues("recurrenceWeekdays", []);
+    this.setCheckboxValues("recurrenceMonths", []);
     this.fields.recurrenceUntil.value = "";
   }
 
@@ -169,30 +172,5 @@ export class TaskModal {
     if (!showDateField) {
       this.fields.recurrenceUntil.value = "";
     }
-  }
-
-  setupEnhancedSelects() {
-    if (typeof TomSelect === "undefined") {
-      return;
-    }
-
-    this.tomSelectInstances = [this.fields.recurrenceWeekdays, this.fields.recurrenceMonths].map((field) =>
-      new TomSelect(field, {
-        plugins: {
-          checkbox_options: {},
-          remove_button: { title: "Quitar" },
-          clear_button: { title: "Limpiar" },
-        },
-        hidePlaceholder: true,
-        closeAfterSelect: false,
-        copyClassesToDropdown: false,
-        controlInput: null,
-        render: {
-          option(item, escape) {
-            return `<div class="ts-option-row"><span class="ts-option-label">${escape(item.text)}</span></div>`;
-          },
-        },
-      })
-    );
   }
 }
